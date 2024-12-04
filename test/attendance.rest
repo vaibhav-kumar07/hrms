@@ -1,0 +1,44 @@
+# Base URL for the API
+@baseUrl = http://localhost:6001/api/attendances
+@id = 1234567890abcdef12345678 
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzRmMDgzMTlkYjVmMWY3MTIwYjg3ZWUiLCJpYXQiOjE3MzMyNDI5MjksImV4cCI6MTczMzI1MDEyOX0.t15Sh_MT-On0K1rgxG2mcWs8HAbl1dVTrZMU_eJ43g8
+### Create Attendance
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "employeeName": "John Doe",
+  "designation": "Software Engineer",
+  "department": "Engineering",
+  "task": "Develop feature X",
+  "status": "WORK_FROM_HOME"
+}
+
+###
+
+### Get All Attendance Records
+GET {{baseUrl}}?filters={"status":"WORK_FROM_HOME"}&pagination={"page":1,"pageSize":10}&sort=employeeName:asc
+Authorization: Bearer <your_token>
+
+###
+
+### Update Attendance Status
+PATCH {{baseUrl}}/{{@id}}/status
+Content-Type: application/json
+Authorization: Bearer <your_token>
+
+{
+  "status": "PRESENT"
+}
+
+###
+
+### Update Attendance Task
+PATCH {{baseUrl}}/{{@id}}/task
+Content-Type: application/json
+Authorization: Bearer <your_token>
+
+{
+  "task": "Fix critical bugs"
+}

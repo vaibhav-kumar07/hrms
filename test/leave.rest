@@ -1,0 +1,45 @@
+# Base URL for the API
+@baseUrl = http://localhost:6001/api/leaves
+@id = 674f30473210f958a4ca9e4f 
+
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzRmMDgzMTlkYjVmMWY3MTIwYjg3ZWUiLCJpYXQiOjE3MzMyODM1MDQsImV4cCI6MTczMzI5MDcwNH0.0sedxBa2H1Al0gXO7VHgiCw9UDYEKpk0xYZN7570Iwk
+### Create Leave
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "John Doe",
+  "date": "2024-12-15",
+  "reason": "Family emergency",
+  "status": ""
+}
+
+###
+
+### Get All Leaves
+GET {{baseUrl}}
+Authorization: Bearer {{token}}
+
+###
+
+### Update Leave Status
+PATCH {{baseUrl}}/{{id}}/status
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "status": "APPROVED"
+}
+
+###
+
+### Update Leave Details
+PUT {{baseUrl}}/{{id}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "reason": "Updated reason for leave",
+  "docs": "binary_data_here"
+}

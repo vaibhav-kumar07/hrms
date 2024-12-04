@@ -1,0 +1,60 @@
+@baseUrl = http://localhost:6001/api/profiles
+@id=674f1cab51fe493bf9ce5194
+
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzRmMDgzMTlkYjVmMWY3MTIwYjg3ZWUiLCJpYXQiOjE3MzMyODM1MDQsImV4cCI6MTczMzI5MDcwNH0.0sedxBa2H1Al0gXO7VHgiCw9UDYEKpk0xYZN7570Iwk
+###
+GET {{baseUrl}}/candidates
+Content-Type: application/json
+
+
+###
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "John Doe",
+  "email": "john.doe1@example.com",
+  "phone": "123-456-7890",
+  "position": "Software Engineer",
+  "department": "Engineering",
+  "experience": "3 years",
+  "img": "profile-pic.jpg",               
+  "status": "NEW",                
+  "role": ""
+}
+
+
+###
+GET {{baseUrl}}/{{id}}
+Content-Type: application/json
+
+
+###
+PUT {{baseUrl}}/{{id}}
+Content-Type: application/json
+
+{
+  "position": "Senior Software Engineer",
+  "department": "Engineering"
+}
+
+####
+PATCH {{baseUrl}}/{{id}}/status
+Content-Type: application/json
+
+{
+  "status": "SELECTED"
+}
+
+
+
+###
+PATCH {{baseUrl}}/{{id}}/role
+Content-Type: application/json
+
+{
+"role": "CANDIDATE"
+}
+
+
