@@ -21,6 +21,7 @@ export const leaveSchema = z.object({
 });
 
 
+
 // Leave Schema for updating the leave status
 export const leaveUpdateStatusSchema = z.object({
     status: z.enum([LeaveStatus.PENDING, LeaveStatus.APPROVED, LeaveStatus.REJECTED], {
