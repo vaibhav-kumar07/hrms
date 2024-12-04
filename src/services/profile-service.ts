@@ -13,15 +13,15 @@ export default class ProfileService {
     }
 
     // Get a profile by ID
-    public async getById(id: string): Promise<IProfile | null> {
+    public async getById(id: string): Promise<IProfile> {
         const profile = await Profile.findById(id).lean();
-        return profile;
+        return profile as IProfile;
     }
 
     // Get a profile by Email
     public async getByEmail(email: string): Promise<IProfile | null> {
         const profile = await Profile.findOne({ email }).lean();
-        return profile;
+        return profile as IProfile;
     }
 
     // Create a new profile (candidate or employee)
