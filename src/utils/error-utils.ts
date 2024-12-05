@@ -16,20 +16,21 @@ export const validateSchema = (schema: ZodSchema, data: any): { isValid: boolean
 
     return { isValid: true };
 };
+
 export const throwBusinessError = (condition: boolean, message: string): void => {
     if (condition) {
-        throw new AppError(message, 409, [], error_type.businessError);
+        throw new AppError(error_type.businessError, message, 409, []);
     }
 };
 
-
+// Check validation result and throw validation error if needed
 export const checkAndThrowError = (validationResult: { isValid: boolean; errors?: Array<{ field: string; value: string }> }): void => {
     if (!validationResult.isValid) {
-        throw new AppError('Validation errors', 400, validationResult.errors, error_type.validationError);
+        throw new AppError(error_type.validationError, "", 400, validationResult.errors);
     }
 };
 
 export enum error_type {
-    validationError = "validation_Error",
-    businessError = "business_Error"
+    validationError = "validation_errors",
+    businessError = "buisness_error"
 }

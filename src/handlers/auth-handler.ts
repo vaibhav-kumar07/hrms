@@ -6,6 +6,7 @@ const authController = new AuthController();
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, email, password } = req.body;
+        console.log("api registration is called with name", name, email, password);
         const { token } = await authController.register({ name: name, email: email, password: password });
         res.status(201).json({ message: 'User Registered successfully', token });
     } catch (error) {
