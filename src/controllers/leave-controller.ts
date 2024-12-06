@@ -12,8 +12,8 @@ export default class LeaveController {
         return await this.leaveService.create(leaveData);
     }
 
-    public async get(filters: any, pagination: any, sort: string): Promise<any> {
-        return await this.leaveService.get(filters, pagination, sort);
+    public async get(filters: any, pagination: any, sort: string, searchText?: string): Promise<any> {
+        return await this.leaveService.get(filters, pagination, sort, searchText);
     }
 
     public async updateStatus(id: string, status: LeaveStatus): Promise<ILeave> {

@@ -3,7 +3,7 @@ import { ILeave, LeaveStatus } from '../interfaces/leave';
 
 const leaveSchema: Schema = new Schema<ILeave>({
     name: { type: String, required: true },
-    date: { type: Date, required: true, unique: true },
+    date: { type: String, required: true, unique: true },
     reason: { type: String, required: true },
     status: {
         type: String,

@@ -1,7 +1,8 @@
 import Leave from '../models/leave';
 import { ILeave, LeaveStatus } from '../interfaces/leave';
-import { applyPagination, applySort } from '../utils/pagination-sort-utils';
+import { applyPagination } from '../utils/pagination-sort-utils';
 import { throwBusinessError } from '../utils/error-utils';
+import { parseFilters } from '../utils/filter-utils';
 
 export default class LeaveService {
     // Private save method for creating or updating leaves
@@ -23,11 +24,17 @@ export default class LeaveService {
     }
 
     // Get all leave requests with optional filters
-    public async get(filters: any, pagination: any, sort: string): Promise<any> {
+    public async get(filters: any, pagination: any, sort: string, searchText?: string): Promise<any> {
         const { limit, skip } = applyPagination(pagination);
-        const sortObj = applySort(sort);
-        const leaveList = await Leave.find(filters)
-            .sort(sortObj as any)
+        const criteria = { ...parseFilters(filters) };
+        if (searchText) {
+            criteria.$or = [
+                { name: { $regex: searchText, $options: 'i' } }
+            ];
+        }
+
+        const leaveList = await Leave.find(criteria)
+            .collation({ locale: 'en' })
             .skip(skip)
             .limit(limit)
             .lean();

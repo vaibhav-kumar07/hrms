@@ -1,10 +1,16 @@
 @baseUrl = http://localhost:6001/api/profiles
 @id=674f1cab51fe493bf9ce5194
 
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzRmMDgzMTlkYjVmMWY3MTIwYjg3ZWUiLCJpYXQiOjE3MzMyODM1MDQsImV4cCI6MTczMzI5MDcwNH0.0sedxBa2H1Al0gXO7VHgiCw9UDYEKpk0xYZN7570Iwk
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzRmMDgzMTlkYjVmMWY3MTIwYjg3ZWUiLCJpYXQiOjE3MzM0NTM0MzMsImV4cCI6MTczMzQ2MDYzM30.blWynN1yONYDCz3Lm3OTlbYQujkG8mZkildGUHsdXJ4
 ###
 GET {{baseUrl}}/candidates
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/employees
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 
 ###

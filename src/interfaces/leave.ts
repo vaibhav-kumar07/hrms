@@ -1,7 +1,7 @@
 export interface ILeave {
     _id?: string;
     name: string;
-    date: Date;
+    date: string;
     reason: string;
     status: LeaveStatus;
     docs?: Buffer;

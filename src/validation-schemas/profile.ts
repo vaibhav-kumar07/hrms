@@ -10,9 +10,9 @@ export const profileSchema = z.object({
     name: z.string().min(1, "Name is required"),  // Name must be a non-empty string
     email: z.string().email("Invalid email address"),  // Email must be a valid email address
     phone: z.string().min(10, "Phone number must be at least 10 characters long"),  // Phone number must be at least 10 characters
-    position: z.string().min(1, "Position is required"), // Position must be non-empty
+    position: z.string().optional(), // Position must be non-empty
     department: z.string().min(1, "Department is required"), // Department must be non-empty
-    experience: z.string().optional(), // Experience is optional, only for candidates
+    experience: z.string(), // Experience is optional, only for candidates
     resume: z.instanceof(Buffer).optional(), // Resume is optional, stored as binary data (for candidates)
     img: z.string().optional(), // Image URL/path, optional for candidates
     status: z.string().optional(), // Status, optional for candidates

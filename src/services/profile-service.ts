@@ -40,15 +40,18 @@ export default class ProfileService {
         const { limit, skip } = applyPagination(pagination);
         const sortObj = applySort(sort);
         const criteria = { ...parseFilters(filters), role };
-
+        console.log("criteria is this ", criteria)
         if (searchText) {
             criteria.$or = [
                 { name: { $regex: searchText, $options: 'i' } },
                 { email: { $regex: searchText, $options: 'i' } },
                 { phone: { $regex: searchText, $options: 'i' } },
+                { position: { $regex: searchText, $options: 'i' } },
+                { department: { $regex: searchText, $options: 'i' } },
             ];
         }
 
+        console.log("criteria: " + criteria)
         // Fetch profiles based on the criteria
         const profileList = await Profile.find(criteria)
             .sort(sortObj as any)
@@ -56,7 +59,7 @@ export default class ProfileService {
             .skip(skip)
             .limit(limit)
             .lean();
-
+        console.log("Profiles", profileList)
         const totalCount = await Profile.countDocuments(criteria);
 
         return {
@@ -91,11 +94,20 @@ export default class ProfileService {
         throwBusinessError(!profile, 'Profile not found');
 
         // Status updates are allowed only for candidates
-        throwBusinessError(profile?.role !== IProfileRole.candidate, 'Status updates are allowed only for candidates');
+        throwBusinessError(
+            profile?.role !== IProfileRole.candidate,
+            'Status updates are allowed only for candidates'
+        );
 
-        // Use save to update the status
+        // If the status is 'Selected', change the role to 'employee'
+        if (status === IProfileStatus.Selected) {
+            profile.role = IProfileRole.employee;
+        }
+
+        // Use save to update the profile with the new status and role (if updated)
         await this.save({ ...profile, status }, false);
     }
+
 
     // Update profile role (e.g., candidate to employee)
     public async updateRole(id: string, role: IProfileRole) {

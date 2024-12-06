@@ -18,7 +18,6 @@ export const getCandidates = async (req: Request, res: Response, next: NextFunct
         const pagination = req.query.pagination || {};
         const sort = req.query.sort as string || 'name:asc';
         const searchText = req.query.searchText as string || '';
-
         const candidates = await profileController.getCandidates(filters, pagination, sort, searchText);
         res.status(200).json(candidates);
     } catch (error) {
@@ -53,7 +52,7 @@ export const getById = async (req: Request, res: Response, next: NextFunction) =
 
 export const update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await profileController.update(req.params.id, req.body);  // Pass ID and data to controller
+        await profileController.update(req.params.id, req.body);
         res.status(200).json({ message: 'Profile updated successfully' });
     } catch (error) {
         next(error);
