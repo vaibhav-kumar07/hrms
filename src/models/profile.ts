@@ -12,10 +12,9 @@ const profileSchema: Schema = new Schema<IProfile>({
     img: { type: String },        // Optional for candidates
     status: { type: String, enum: Object.values(IProfileStatus) }, // Optional for candidates
     joining_date: { type: Date }, // Optional for employees
-    role: { type: String, required: true, enum: Object.values(IProfileRole) }, // Role field
-}
-    , {
-        collection: "profile"
-    });
+    role: { type: String, required: true, enum: Object.values(IProfileRole) }
+}, {
+    collection: "profile"
+});
 
 export default mongoose.model<IProfile>('Profile', profileSchema);

@@ -1,12 +1,11 @@
 export interface IAttendance {
-    _id?: string;           // MongoDB ID
-    employeeName: string;   // Employee's name
-    designation: string;    // Employee's designation
-    department: string;     // Employee's department
-    task: string;           // Task details
-    status: AttendanceStatus; // Status of attendance
-}
+    _id?: string
+    employeeId: string
+    date: Date
+    task: string;
+    status: AttendanceStatus
 
+}
 export enum AttendanceStatus {
     PRESENT = 'PRESENT',
     ABSENT = 'ABSENT',

@@ -1,19 +1,20 @@
 @baseUrl = http://localhost:6001/api/profiles
-@id=674f1cab51fe493bf9ce5194
-
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzRmMDgzMTlkYjVmMWY3MTIwYjg3ZWUiLCJpYXQiOjE3MzM0NTM0MzMsImV4cCI6MTczMzQ2MDYzM30.blWynN1yONYDCz3Lm3OTlbYQujkG8mZkildGUHsdXJ4
+@id=6751d86406b8509f92d00a6c
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzRmMDgzMTlkYjVmMWY3MTIwYjg3ZWUiLCJpYXQiOjE3MzM2NzcxNjUsImV4cCI6MTczMzY4NDM2NX0.xozdjjamLwZGPIqjzvdP7RHxq9BFDE1p_lyb-mGKdo4
 ###
+
 GET {{baseUrl}}/candidates
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ###
-GET {{baseUrl}}/employees
+
+GET {{baseUrl}}/employees?today=2024-12-07T00:00:00Z
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-
 ###
+
 POST {{baseUrl}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -30,13 +31,14 @@ Authorization: Bearer {{token}}
   "role": ""
 }
 
-
 ###
+
 GET {{baseUrl}}/{{id}}
 Content-Type: application/json
-
+Authorization: Bearer {{token}}
 
 ###
+
 PUT {{baseUrl}}/{{id}}
 Content-Type: application/json
 
@@ -45,7 +47,8 @@ Content-Type: application/json
   "department": "Engineering"
 }
 
-####
+###
+
 PATCH {{baseUrl}}/{{id}}/status
 Content-Type: application/json
 
@@ -53,14 +56,33 @@ Content-Type: application/json
   "status": "SELECTED"
 }
 
-
-
 ###
+
 PATCH {{baseUrl}}/{{id}}/role
 Content-Type: application/json
 
 {
-"role": "CANDIDATE"
+  "role": "CANDIDATE"
 }
 
+###
 
+PATCH {{baseUrl}}/{{id}}/attendance
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "status": "ABSENT",
+  "today": "2024-12-07T00:00:00Z"
+}
+
+###
+PATCH {{baseUrl}}/{{id}}/task
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+ 
+  "task": "Complete the daily report",
+  "today": "2024-12-07T00:00:00Z"
+}

@@ -35,6 +35,15 @@ export const updateProfileRoleSchema = z.object({
 });
 
 
+export const updateProfileAttenceSchema = z.object({
+    _id: mongooseId,
+    attendance: z.enum([IProfileRole.candidate, IProfileRole.employee], {
+        errorMap: () => ({ message: "Invalid role. Expected 'CANDIDATE' or 'EMPLOYEE'." }),
+    }),
+});
+
+
+
 
 // Update Profile Schema
 export const updateProfileSchema = z.object({

@@ -3,8 +3,11 @@ import { IProfile, IProfileRole, IProfileStatus } from '../interfaces/profile'; 
 import { applyPagination, applySort } from '../utils/pagination-sort-utils';
 import { parseFilters } from '../utils/filter-utils';
 import { throwBusinessError } from '../utils/error-utils'; // Import throwBusinessError
+import AttendanceService from './attendance-service';
+import { AttendanceStatus, IAttendance } from '../interfaces/attendance';
 
 export default class ProfileService {
+    private attendanceService = new AttendanceService();
 
     private async save(input: Partial<IProfile>, isNew: boolean = true): Promise<IProfile> {
         const profile = new Profile(input);
@@ -15,6 +18,7 @@ export default class ProfileService {
     // Get a profile by ID
     public async getById(id: string): Promise<IProfile> {
         const profile = await Profile.findById(id).lean();
+        throwBusinessError(!profile, "Profile not found");
         return profile as IProfile;
     }
 
@@ -36,11 +40,17 @@ export default class ProfileService {
     }
 
     // Get profiles based on role, filters, pagination, and sorting
-    public async get(role: IProfileRole, filters: any, pagination: any, sort: string, searchText?: string): Promise<any> {
+    public async get(
+        role: IProfileRole,
+        filters: any,
+        pagination: any,
+        sort: string,
+        today: string,
+        searchText?: string
+    ): Promise<any> {
         const { limit, skip } = applyPagination(pagination);
-        const sortObj = applySort(sort);
         const criteria = { ...parseFilters(filters), role };
-        console.log("criteria is this ", criteria)
+
         if (searchText) {
             criteria.$or = [
                 { name: { $regex: searchText, $options: 'i' } },
@@ -51,15 +61,56 @@ export default class ProfileService {
             ];
         }
 
-        console.log("criteria: " + criteria)
-        // Fetch profiles based on the criteria
-        const profileList = await Profile.find(criteria)
-            .sort(sortObj as any)
-            .collation({ locale: 'en' })
-            .skip(skip)
-            .limit(limit)
-            .lean();
-        console.log("Profiles", profileList)
+        const date = new Date(today); // Parse today's date
+        const startOfDay = new Date(date.setUTCHours(0, 0, 0, 0)); // Midnight UTC
+        const endOfDay = new Date(date.setUTCHours(23, 59, 59, 999)); // End of the day
+
+        const profileList = await Profile.aggregate([
+            { $match: criteria }, // Apply profile filters
+            { $skip: skip },      // Pagination skip
+            { $limit: limit },    // Pagination limit
+            {
+                $lookup: {
+                    from: 'attendance',
+                    let: { profileId: { $toString: '$_id' } }, // Convert ObjectId to string
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$employeeId', '$$profileId'] }, // Match employeeId
+                                        { $gte: ['$date', startOfDay] }, // Match start of day
+                                        { $lte: ['$date', endOfDay] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'attendance'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$attendance',
+                    preserveNullAndEmptyArrays: true, // Keep profiles with no attendance
+                }
+            },
+            {
+                $addFields: {
+                    task: { $ifNull: ['$attendance.task', ''] }, // Default empty task
+                    addendance_status: { $ifNull: ['$attendance.status', ''] }, // Default empty status
+                }
+            },
+            {
+                $project: {
+                    attendance: 0 // Remove raw attendance data
+                }
+            }
+        ]);
+
+
+        console.log("Profiles with today's attendance", profileList);
+
         const totalCount = await Profile.countDocuments(criteria);
 
         return {
@@ -75,6 +126,7 @@ export default class ProfileService {
         };
     }
 
+
     // Update profile data
     public async update(id: string, profileData: Partial<IProfile>) {
         const profile = await this.getById(id);
@@ -83,31 +135,23 @@ export default class ProfileService {
         throwBusinessError(!profile, 'Profile not found');
 
         // Use save to update the profile
-        await this.save({ ...profile, ...profileData }, false); // Update profile with new data
+        await this.save({ ...profile, ...profileData }, false);
     }
 
     // Update profile status (only for candidates)
     public async updateStatus(id: string, status: IProfileStatus) {
         const profile = await this.getById(id);
-
-        // Throw business error if profile not found
         throwBusinessError(!profile, 'Profile not found');
-
-        // Status updates are allowed only for candidates
         throwBusinessError(
             profile?.role !== IProfileRole.candidate,
             'Status updates are allowed only for candidates'
         );
 
-        // If the status is 'Selected', change the role to 'employee'
         if (status === IProfileStatus.Selected) {
             profile.role = IProfileRole.employee;
         }
-
-        // Use save to update the profile with the new status and role (if updated)
         await this.save({ ...profile, status }, false);
     }
-
 
     // Update profile role (e.g., candidate to employee)
     public async updateRole(id: string, role: IProfileRole) {
@@ -121,5 +165,24 @@ export default class ProfileService {
 
         // Use save to persist the changes
         return await this.save(updatedProfile, false);
+    }
+
+    // Update attendance status
+    public async updateAttendanceStatus(employeeId: string, status: AttendanceStatus, today: string) {
+        const employee = await Profile.findById(employeeId);
+        if (!employee) {
+            throwBusinessError(true, 'Employee not found');
+        }
+
+        return await this.attendanceService.updateStatus(employeeId, today, status);
+    }
+
+    // Update attendance task
+    public async updateAttendanceTask(employeeId: string, task: string, today: string) {
+        const employee = await Profile.findById(employeeId);
+        if (!employee) {
+            throwBusinessError(true, 'Employee not found');
+        }
+        return await this.attendanceService.updateTask(employeeId, today, task);
     }
 }

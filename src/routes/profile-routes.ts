@@ -11,5 +11,10 @@ router.get('/:id', authorizer, profileHandler.getById);          // Get profile 
 router.put('/:id', authorizer, profileHandler.update);           // Update a profile
 router.patch('/:id/status', authorizer, profileHandler.updateStatus);   // Update candidate status
 router.patch('/:id/role', authorizer, profileHandler.updateRole);
+router.patch('/:id/attendance', authorizer, profileHandler.updateAttendance
+);
+router.patch('/:id/task', authorizer, profileHandler.addTask);
+
+
 
 export default router;

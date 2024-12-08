@@ -1,6 +1,5 @@
 import Attendance from '../models/attendance'; // Attendance model
 import { IAttendance, AttendanceStatus } from '../interfaces/attendance';
-import { applyPagination, applySort } from '../utils/pagination-sort-utils';
 
 export default class AttendanceService {
     // Private save method for creating or updating attendance records
@@ -12,52 +11,54 @@ export default class AttendanceService {
 
     // Create a new attendance record
     public async create(attendanceData: IAttendance): Promise<string> {
-        return (await this.save(attendanceData, true))._id as string
+        return (await this.save(attendanceData, true))._id as string;
     }
 
-    // Get all attendance records with optional filters
-    public async get(filters: any, pagination: any, sort: string): Promise<any> {
-        const { limit, skip } = applyPagination(pagination);
-        const sortObj = applySort(sort);
 
-        const attendanceList = await Attendance.find(filters)
-            .sort(sortObj as any)
-            .skip(skip)
-            .limit(limit)
-            .lean();
-
-        const totalCount = await Attendance.countDocuments(filters);
-
-        return {
-            data: attendanceList,
-            meta: {
-                pagination: {
-                    page: skip / limit + 1,
-                    pageSize: limit,
-                    pageCount: Math.ceil(totalCount / limit),
-                    total: totalCount,
-                },
-            },
-        };
+    public async getByEmployeeAndDate(employeeId: string, date: string): Promise<IAttendance | null> {
+        // Convert date string to Date object
+        const dateObject = new Date(date);
+        return await Attendance.findOne({
+            employeeId,
+            date: dateObject, // MongoDB expects a Date object for exact match
+        }).lean();
     }
 
     // Update attendance status
-    public async updateStatus(id: string, status: AttendanceStatus) {
-        const attendance = await Attendance.findById(id);
-        if (!attendance) {
-            throw new Error('Attendance record not found');
-        }
+    public async updateStatus(employeeId: string, date: string, status: AttendanceStatus) {
+        const dateObject = new Date(date); // Convert to Date object
+        const attendance = await this.getByEmployeeAndDate(employeeId, dateObject.toISOString());
 
-        return await this.save({ ...attendance.toObject(), status }, false);
+        if (attendance) {
+            return await this.save({ ...attendance, status }, false);
+        } else {
+            const attendanceData: IAttendance = {
+                employeeId,
+                date: dateObject, // Store as Date object
+                task: '',
+                status,
+            };
+            return await this.create(attendanceData);
+        }
     }
 
-    // Update attendance task
-    public async updateTask(id: string, task: string) {
-        const attendance = await Attendance.findById(id);
-        if (!attendance) {
-            throw new Error('Attendance record not found');
-        }
 
-        return await this.save({ ...attendance.toObject(), task }, false);
+    public async updateTask(employeeId: string, date: string, task: string) {
+        const dateObject = new Date(date); // Convert to Date object
+        const attendance = await this.getByEmployeeAndDate(employeeId, dateObject.toISOString());
+
+        if (attendance) {
+            return await this.save({ ...attendance, task }, false);
+        } else {
+            const attendanceData: IAttendance = {
+                employeeId,
+                date: dateObject, // Store as Date object
+                task,
+                status: AttendanceStatus.WORK_FROM_HOME, // Default status
+            };
+            return await this.create(attendanceData);
+        }
     }
+
+
 }

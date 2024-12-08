@@ -2,7 +2,8 @@ import ProfileService from '../services/profile-service';
 import { IProfile, IProfileRole, IProfileStatus } from '../interfaces/profile'; // Profile interface
 import { checkAndThrowError, validateSchema } from '../utils/error-utils';
 import { mandatoryString, profileSchema, updateProfileRoleSchema, updateProfileSchema, updateProfileStatusSchema } from '../validation-schemas/profile';
-
+import { AttendanceStatus } from '../interfaces/attendance';
+import { todayAndStatusSchema, todayAndTaskSchema } from '../validation-schemas/attendance';
 
 export default class ProfileController {
     private profileService = new ProfileService();
@@ -15,12 +16,12 @@ export default class ProfileController {
     }
 
     public async getCandidates(filters: any, pagination: any, sort: string, searchText?: string) {
-        return await this.profileService.get(IProfileRole.candidate, filters, pagination, sort, searchText);
+        return await this.profileService.get(IProfileRole.candidate, filters, pagination, sort, "", searchText);
     }
 
     // Fetch employees
-    public async getEmployees(filters: any, pagination: any, sort: string, searchText?: string) {
-        return await this.profileService.get(IProfileRole.employee, filters, pagination, sort, searchText);
+    public async getEmployees(filters: any, pagination: any, sort: string, today: string, searchText?: string) {
+        return await this.profileService.get(IProfileRole.employee, filters, pagination, sort, today, searchText);
     }
     public async getById(id: string) {
         const validationResult = validateSchema(mandatoryString, id)
@@ -48,6 +49,17 @@ export default class ProfileController {
         const validationResult = validateSchema(updateProfileRoleSchema, { _id: id, role })
         checkAndThrowError(validationResult);
         return await this.profileService.updateRole(id, role);
+    }
+    public async updateAttendance(employeeId: string, status: string, date: string) {
+        const validationResult = validateSchema(todayAndStatusSchema, { _id: employeeId, date, status })
+        checkAndThrowError(validationResult);
+        return await this.profileService.updateAttendanceStatus(employeeId, status as AttendanceStatus, date);
+    }
+
+    public async addTask(employeeId: string, task: string, date: string) {
+        const validationResult = validateSchema(todayAndTaskSchema, { _id: employeeId, date, task })
+        checkAndThrowError(validationResult);
+        return await this.profileService.updateAttendanceTask(employeeId, task, date);
     }
 }
 

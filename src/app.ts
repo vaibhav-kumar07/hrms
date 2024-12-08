@@ -8,7 +8,7 @@ import { defaultErrorHandler } from './middlerwares/error-middleware';
 import authRoutes from './routes/auth-routes';
 import profileRoutes from "./routes/profile-routes"
 import leaveRoutes from "./routes/leave-routes"
-import attendanceRoutes from "./routes/attendance-routes"
+
 // Initialize environment variables
 dotenv.config();
 CommonVariables.init();
@@ -48,7 +48,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/leaves', leaveRoutes)
-app.use("/api/attendances", attendanceRoutes);
+
 // Error handling middleware
 app.use(defaultErrorHandler);
 

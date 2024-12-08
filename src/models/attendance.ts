@@ -2,14 +2,18 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { IAttendance, AttendanceStatus } from '../interfaces/attendance';
 
 const attendanceSchema: Schema = new Schema<IAttendance>({
-    employeeName: { type: String, required: true },
-    designation: { type: String, required: true },
-    department: { type: String, required: true },
-    task: { type: String, required: true },
+    employeeId: {
+        type: String, required: true
+    },
+    date: {
+        type: Date, required: true
+    },
+    task: { type: String },
     status: {
         type: String,
         enum: Object.values(AttendanceStatus),
-        required: true
+        default: AttendanceStatus.ABSENT,
+
     },
 }, {
     collection: "attendance"
