@@ -1,8 +1,9 @@
 import Attendance from '../models/attendance'; // Attendance model
 import { IAttendance, AttendanceStatus } from '../interfaces/attendance';
 
+
 export default class AttendanceService {
-    // Private save method for creating or updating attendance records
+
     private async save(input: Partial<IAttendance>, isNew: boolean = true): Promise<IAttendance> {
         const attendance = new Attendance(input);
         attendance.isNew = isNew;
@@ -16,25 +17,23 @@ export default class AttendanceService {
 
 
     public async getByEmployeeAndDate(employeeId: string, date: string): Promise<IAttendance | null> {
-        // Convert date string to Date object
-        const dateObject = new Date(date);
+        // Since date is now a string, we can directly match the date string
         return await Attendance.findOne({
             employeeId,
-            date: dateObject, // MongoDB expects a Date object for exact match
+            date, // Match the exact date string
         }).lean();
     }
 
-    // Update attendance status
+    // Update attendance status (ignore time, only match the date string)
     public async updateStatus(employeeId: string, date: string, status: AttendanceStatus) {
-        const dateObject = new Date(date); // Convert to Date object
-        const attendance = await this.getByEmployeeAndDate(employeeId, dateObject.toISOString());
+        const attendance = await this.getByEmployeeAndDate(employeeId, date);
 
         if (attendance) {
             return await this.save({ ...attendance, status }, false);
         } else {
             const attendanceData: IAttendance = {
                 employeeId,
-                date: dateObject, // Store as Date object
+                date, // Store date as string
                 task: '',
                 status,
             };
@@ -42,23 +41,20 @@ export default class AttendanceService {
         }
     }
 
-
+    // Update attendance task (ignore time, only match the date string)
     public async updateTask(employeeId: string, date: string, task: string) {
-        const dateObject = new Date(date); // Convert to Date object
-        const attendance = await this.getByEmployeeAndDate(employeeId, dateObject.toISOString());
+        const attendance = await this.getByEmployeeAndDate(employeeId, date);
 
         if (attendance) {
             return await this.save({ ...attendance, task }, false);
         } else {
             const attendanceData: IAttendance = {
                 employeeId,
-                date: dateObject, // Store as Date object
+                date, // Store date as string
                 task,
                 status: AttendanceStatus.WORK_FROM_HOME, // Default status
             };
             return await this.create(attendanceData);
         }
     }
-
-
 }

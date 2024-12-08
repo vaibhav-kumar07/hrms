@@ -5,9 +5,7 @@ const attendanceSchema: Schema = new Schema<IAttendance>({
     employeeId: {
         type: String, required: true
     },
-    date: {
-        type: Date, required: true
-    },
+    date: { type: String, required: true },
     task: { type: String },
     status: {
         type: String,

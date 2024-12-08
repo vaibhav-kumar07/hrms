@@ -1,7 +1,7 @@
 export interface IAttendance {
     _id?: string
     employeeId: string
-    date: Date
+    date: string
     task: string;
     status: AttendanceStatus
 

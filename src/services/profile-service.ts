@@ -4,7 +4,7 @@ import { applyPagination, applySort } from '../utils/pagination-sort-utils';
 import { parseFilters } from '../utils/filter-utils';
 import { throwBusinessError } from '../utils/error-utils'; // Import throwBusinessError
 import AttendanceService from './attendance-service';
-import { AttendanceStatus, IAttendance } from '../interfaces/attendance';
+import { AttendanceStatus } from '../interfaces/attendance';
 
 export default class ProfileService {
     private attendanceService = new AttendanceService();
@@ -61,9 +61,7 @@ export default class ProfileService {
             ];
         }
 
-        const date = new Date(today); // Parse today's date
-        const startOfDay = new Date(date.setUTCHours(0, 0, 0, 0)); // Midnight UTC
-        const endOfDay = new Date(date.setUTCHours(23, 59, 59, 999)); // End of the day
+        const date = today; // Use today directly (in YYYY-MM-DD format)
 
         const profileList = await Profile.aggregate([
             { $match: criteria }, // Apply profile filters
@@ -79,8 +77,7 @@ export default class ProfileService {
                                 $expr: {
                                     $and: [
                                         { $eq: ['$employeeId', '$$profileId'] }, // Match employeeId
-                                        { $gte: ['$date', startOfDay] }, // Match start of day
-                                        { $lte: ['$date', endOfDay] }
+                                        { $eq: ['$date', date] } // Match date exactly as string
                                     ]
                                 }
                             }
@@ -98,7 +95,7 @@ export default class ProfileService {
             {
                 $addFields: {
                     task: { $ifNull: ['$attendance.task', ''] }, // Default empty task
-                    addendance_status: { $ifNull: ['$attendance.status', ''] }, // Default empty status
+                    attendance_status: { $ifNull: ['$attendance.status', ''] }, // Default empty status
                 }
             },
             {
