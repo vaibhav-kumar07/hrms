@@ -33,8 +33,9 @@ export const getEmployees = async (req: Request, res: Response, next: NextFuncti
         const sort = req.query.sort as string || 'name:asc';
         const searchText = req.query.searchText as string || '';
         const today = req.query.today;
-        console.log("today: " + today);
-        const employees = await profileController.getEmployees(filters, pagination, sort, today as string, searchText);
+        const attendance_status = req.query.attendance_status as string || '';
+
+        const employees = await profileController.getEmployees(filters, pagination, sort, today as string, searchText, attendance_status);
         res.status(200).json(employees);
     } catch (error) {
         next(error);  // Pass error to the error handler
@@ -94,6 +95,7 @@ export const updateAttendance = async (req: Request, res: Response, next: NextFu
 export const addTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { today, task } = req.body;
+        console.log("today is ", task, today)
         await profileController.addTask(req.params.id, task, today);
         res.status(201).json({ message: 'Task added successfully' });
     } catch (error) {

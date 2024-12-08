@@ -20,9 +20,9 @@ export const todayDateSchema = z.string().refine((value) => {
 
 // Schema for `todayAndTaskSchema`
 export const todayAndTaskSchema = z.object({
-    _id: mongooseId,         // Profile ID validation
-    date: todayDateSchema,   // Date in YYYY-MM-DD format
-    task: z.string().min(10, { message: "Task must be at least 10 characters long" }),  // Task validation
+    _id: mongooseId,
+    date: todayDateSchema,
+    task: z.string().min(1, { message: "Task must be at least 1 characters long" }),
 });
 
 // Schema for `todayAndStatusSchema`

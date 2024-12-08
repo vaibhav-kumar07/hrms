@@ -20,8 +20,8 @@ export default class ProfileController {
     }
 
     // Fetch employees
-    public async getEmployees(filters: any, pagination: any, sort: string, today: string, searchText?: string) {
-        return await this.profileService.get(IProfileRole.employee, filters, pagination, sort, today, searchText);
+    public async getEmployees(filters: any, pagination: any, sort: string, today: string, searchText?: string, attendance_status?: string) {
+        return await this.profileService.get(IProfileRole.employee, filters, pagination, sort, today, searchText, attendance_status);
     }
     public async getById(id: string) {
         const validationResult = validateSchema(mandatoryString, id)

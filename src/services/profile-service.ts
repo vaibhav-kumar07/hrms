@@ -38,15 +38,14 @@ export default class ProfileService {
         // If no existing profile, save the new profile
         return (await this.save(profileData, true))._id as string;
     }
-
-    // Get profiles based on role, filters, pagination, and sorting
     public async get(
         role: IProfileRole,
         filters: any,
         pagination: any,
         sort: string,
         today: string,
-        searchText?: string
+        searchText?: string,
+        attendance_status?: string
     ): Promise<any> {
         const { limit, skip } = applyPagination(pagination);
         const criteria = { ...parseFilters(filters), role };
@@ -63,7 +62,8 @@ export default class ProfileService {
 
         const date = today; // Use today directly (in YYYY-MM-DD format)
 
-        const profileList = await Profile.aggregate([
+        // Initialize the pipeline
+        const pipeline: any[] = [
             { $match: criteria }, // Apply profile filters
             { $skip: skip },      // Pagination skip
             { $limit: limit },    // Pagination limit
@@ -103,11 +103,18 @@ export default class ProfileService {
                     attendance: 0 // Remove raw attendance data
                 }
             }
-        ]);
+        ];
 
+        // Apply attendance status filter if provided
+        if (attendance_status) {
+            pipeline.push({
+                $match: {
+                    'attendance_status': attendance_status // Filter based on attendance status
+                }
+            });
+        }
 
-        console.log("Profiles with today's attendance", profileList);
-
+        const profileList = await Profile.aggregate(pipeline);
         const totalCount = await Profile.countDocuments(criteria);
 
         return {
