@@ -24,7 +24,7 @@ export default class LeaveService {
     }
 
     // Get all leave requests with optional filters
-    public async get(filters: any, pagination: any, sort: string, searchText?: string): Promise<any> {
+    public async get(filters: any, pagination: any, sort: string, today: string, searchText?: string): Promise<any> {
         const { limit, skip } = applyPagination(pagination);
         const criteria = { ...parseFilters(filters) };
         if (searchText) {
@@ -32,7 +32,10 @@ export default class LeaveService {
                 { name: { $regex: searchText, $options: 'i' } }
             ];
         }
-
+        console.log("criteria called ", today)
+        if (today) {
+            criteria.date = today;
+        }
         const leaveList = await Leave.find(criteria)
             .collation({ locale: 'en' })
             .skip(skip)

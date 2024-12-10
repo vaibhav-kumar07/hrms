@@ -7,9 +7,8 @@ export const leaveSchema = z.object({
         .min(3, "Name must be at least 3 characters long") // Ensure name is at least 3 characters
         .max(100, "Name must be less than 100 characters"), // Limit name length to 100
 
-    date: z.coerce.date()
-        .refine((d) => d >= new Date(), "Date must be in the future") // Ensure the date is in the future
-        .refine((d) => !isNaN(d.getTime()), "Invalid date format"), // Ensure valid date format
+    date: z.string()
+        .refine((value) => typeof value === 'string' && value.trim().length > 0, "Date must be a valid non-empty string"), // Check if it's a valid non-empty string
 
     reason: z.string()
         .nonempty("Reason is required")
@@ -21,7 +20,6 @@ export const leaveSchema = z.object({
 });
 
 
-
 // Leave Schema for updating the leave status
 export const leaveUpdateStatusSchema = z.object({
     status: z.enum([LeaveStatus.PENDING, LeaveStatus.APPROVED, LeaveStatus.REJECTED], {
@@ -31,7 +29,6 @@ export const leaveUpdateStatusSchema = z.object({
 
 export const leaveUpdateSchema = z.object({
     name: z.string().optional(),
-
     date: z.coerce.date().optional().refine((d) => {
         // Only apply the check if the date is not undefined
         if (d) {

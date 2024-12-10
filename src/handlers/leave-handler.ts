@@ -19,8 +19,8 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
         const pagination = req.query.pagination || {};
         const sort = req.query.sort as string || 'date:asc';
         const searchText = req.query.searchText as string || '';
-        console.log("searchText", searchText)
-        const leaves = await leaveController.get(filters, pagination, sort, searchText);
+        const today = req.query.today as string
+        const leaves = await leaveController.get(filters, pagination, sort, today, searchText);
         res.status(200).json(leaves);
     } catch (error) {
         next(error);
